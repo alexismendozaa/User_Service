@@ -4,123 +4,51 @@ services:
   delete-account-ms:
     build:
       context: ./delete-account-ms
-    image: "${DOCKERHUB_USERNAME}/delete-account-ms:latest"  
     ports:
-      - "5008:3008"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_REGION=${AWS_REGION}
-      - DB_PORT=${DB_PORT}
-      - DB_SSL=${DB_SSL}
+      - "3008:5008"
     networks:
-      - auth_network
+      - user_service_network
 
   edit-avatar-ms:
     build:
       context: ./edit-avatar-ms
-    image: "${DOCKERHUB_USERNAME}/edit-avatar-ms:latest"  
     ports:
-      - "5007:3007"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_REGION=${AWS_REGION}
-      - DB_PORT=${DB_PORT}
-      - DB_SSL=${DB_SSL}
+      - "3007:5007"
     networks:
-      - auth_network
+      - user_service_network
 
   edit-email-ms:
     build:
       context: ./edit-email-ms
-    image: "${DOCKERHUB_USERNAME}/edit-email-ms:latest"  
     ports:
-      - "5005:3005"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_REGION=${AWS_REGION}
-      - DB_PORT=${DB_PORT}
-      - DB_SSL=${DB_SSL}
+      - "3005:5005"
     networks:
-      - auth_network
+      - user_service_network
 
   edit-password-ms:
     build:
       context: ./edit-password-ms
-    image: "${DOCKERHUB_USERNAME}/edit-password-ms:latest"  
     ports:
-      - "5006:3006"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_REGION=${AWS_REGION}
-      - DB_PORT=${DB_PORT}
-      - DB_SSL=${DB_SSL}
+      - "3006:5006"
     networks:
-      - auth_network
+      - user_service_network
 
   edit-username-ms:
     build:
       context: ./edit-username-ms
-    image: "${DOCKERHUB_USERNAME}/edit-username-ms:latest"  
     ports:
-      - "5004:3004"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_REGION=${AWS_REGION}
-      - DB_PORT=${DB_PORT}
-      - DB_SSL=${DB_SSL}
+      - "3004:5004"
     networks:
-      - auth_network
+      - user_service_network
 
   get-info-ms:
     build:
       context: ./get-info-ms
-    image: "${DOCKERHUB_USERNAME}/get-info-ms:latest"  
     ports:
-      - "5009:3009"
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_REGION=${AWS_REGION}
-      - DB_PORT=${DB_PORT}
-      - DB_SSL=${DB_SSL}
+      - "3009:5009"
     networks:
-      - auth_network
+      - user_service_network
 
 networks:
-  auth_network:
+  user_service_network:
     driver: bridge
