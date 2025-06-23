@@ -104,8 +104,8 @@ jobs:
           export JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
           export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
           export AWS_REGION=${{ secrets.AWS_REGION }}
-          export AWS_REGION=${{ secrets.DB_PORT }}
-          export AWS_REGION=${{ secrets.DB_SSL }}
+          export DB_PORT=${{ secrets.DB_PORT }}
+          export DB_SSL=${{ secrets.DB_SSL }}
 
           # Run containers for each microservice
           docker run -d --name delete-account-ms \
@@ -118,8 +118,8 @@ jobs:
             -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
             -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
             -e AWS_REGION=${{ secrets.AWS_REGION }} \
-            -e AWS_REGION=${{ secrets.DB_PORT }} \
-            -e AWS_REGION=${{ secrets.DB_SSL }}\
+            -e AWS_DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_SSL=${{ secrets.DB_SSL }}\
             ${{ secrets.DOCKERHUB_USERNAME }}/delete-account-ms:latest
 
           docker run -d --name edit-avatar-ms \
@@ -132,8 +132,8 @@ jobs:
             -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
             -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
             -e AWS_REGION=${{ secrets.AWS_REGION }} \
-            -e AWS_REGION=${{ secrets.DB_PORT }} \
-            -e AWS_REGION=${{ secrets.DB_SSL }}\
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_SSL=${{ secrets.DB_SSL }}\
             ${{ secrets.DOCKERHUB_USERNAME }}/edit-avatar-ms:latest
 
           docker run -d --name edit-email-ms \
@@ -146,8 +146,8 @@ jobs:
             -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
             -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
             -e AWS_REGION=${{ secrets.AWS_REGION }} \
-            -e AWS_REGION=${{ secrets.DB_PORT }} \
-            -e AWS_REGION=${{ secrets.DB_SSL }}\
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_SSL=${{ secrets.DB_SSL }}\
             ${{ secrets.DOCKERHUB_USERNAME }}/edit-email-ms:latest
 
           docker run -d --name edit-password-ms \
@@ -160,8 +160,8 @@ jobs:
             -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
             -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
             -e AWS_REGION=${{ secrets.AWS_REGION }} \
-            -e AWS_REGION=${{ secrets.DB_PORT }} \
-            -e AWS_REGION=${{ secrets.DB_SSL }}\
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_SSL=${{ secrets.DB_SSL }}\
             ${{ secrets.DOCKERHUB_USERNAME }}/edit-password-ms:latest
 
           docker run -d --name edit-username-ms \
@@ -174,8 +174,8 @@ jobs:
             -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
             -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
             -e AWS_REGION=${{ secrets.AWS_REGION }} \
-            -e AWS_REGION=${{ secrets.DB_PORT }} \
-            -e AWS_REGION=${{ secrets.DB_SSL }}\
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_SSL=${{ secrets.DB_SSL }}\
             ${{ secrets.DOCKERHUB_USERNAME }}/edit-username-ms:latest
 
             docker run -d --name get-info-ms \
@@ -188,6 +188,6 @@ jobs:
             -e JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
             -e S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
             -e AWS_REGION=${{ secrets.AWS_REGION }} \
-            -e AWS_REGION=${{ secrets.DB_PORT }} \
-            -e AWS_REGION=${{ secrets.DB_SSL }}\
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_SSL=${{ secrets.DB_SSL }}\
             ${{ secrets.DOCKERHUB_USERNAME }}/get-info-ms:latest
