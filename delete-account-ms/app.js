@@ -13,7 +13,7 @@ app.use(userRoutes);
 
 setupSwagger(app);
 
-const PORT = process.env.PORT || 3008;
+const PORT =  3008;
 
 app.listen(PORT, () => {
   console.log(`Edit Username Service running on port ${PORT}`);

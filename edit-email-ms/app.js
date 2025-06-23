@@ -13,7 +13,7 @@ app.use(userRoutes);
 
 setupSwagger(app);
 
-const PORT = process.env.PORT || 3005;
+const PORT =  3005;
 
 app.listen(PORT, () => {
   console.log(`Edit Email Service running on port ${PORT}`);
