@@ -3,7 +3,11 @@ name: Docker Build and Deploy
 on:
   push:
     branches:
+      - main
       - test
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build_and_deploy:
@@ -25,7 +29,7 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # Step 4: Install dependencies and run tests for each microservicio
+      # Step 4: Install dependencies and run tests for each microservice
       - name: Install dependencies and run tests for all microservices
         run: |
           for dir in delete-account-ms edit-avatar-ms edit-email-ms edit-password-ms edit-username-ms get-info-ms; do
@@ -45,13 +49,25 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml push
 
-      # Step 7: Clean up existing containers on EC2
+      # Step 7: Set target secrets based on branch
+      - name: Set deployment secrets
+        id: set_secrets
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "EC2=${{ secrets.EC2_PROD }}" >> $GITHUB_ENV
+            echo "SSH_KEY=${{ secrets.SSH_KEY_PROD }}" >> $GITHUB_ENV
+          else
+            echo "EC2=${{ secrets.EC2_QA }}" >> $GITHUB_ENV
+            echo "SSH_KEY=${{ secrets.SSH_KEY_QA }}" >> $GITHUB_ENV
+          fi
+
+      # Step 8: Clean up existing containers on EC2
       - name: Clean up existing containers on EC2
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_QA }}
+          host: ${{ env.EC2 }}
           username: ubuntu
-          key: ${{ secrets.SSH_KEY_QA }}
+          key: ${{ env.SSH_KEY }}
           port: 22
           debug: true
           script: |
@@ -59,17 +75,17 @@ jobs:
             docker rm $(docker ps -aq) || true
             docker system prune -af || true
 
-      # Step 8: Deploy to EC2 via SSH
+      # Step 9: Deploy to EC2 via SSH
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_QA }}
+          host: ${{ env.EC2 }}
           username: ubuntu
-          key: ${{ secrets.SSH_KEY_QA }}
+          key: ${{ env.SSH_KEY }}
           port: 22
           debug: true
           script: |
-            # Export environment variables para cada microservicio
+            # Export environment variables for each microservice
             export DB_HOST=${{ secrets.DB_HOST }}
             export DB_USER=${{ secrets.DB_USER }}
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
