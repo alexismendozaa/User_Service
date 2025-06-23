@@ -4,14 +4,17 @@ services:
   delete-account-ms:
     build:
       context: ./delete-account-ms
+      image: alexismendozaa/delete-account-ms:latest  
     ports:
       - "3008:5008"
     networks:
       - user_service_network
 
   edit-avatar-ms:
+  
     build:
       context: ./edit-avatar-ms
+      image: alexismendozaa/edit-avatar-ms:latest  
     ports:
       - "3007:5007"
     networks:
@@ -20,6 +23,7 @@ services:
   edit-email-ms:
     build:
       context: ./edit-email-ms
+      image: alexismendozaa/edit-email-ms:latest  
     ports:
       - "3005:5005"
     networks:
@@ -28,6 +32,7 @@ services:
   edit-password-ms:
     build:
       context: ./edit-password-ms
+      image: alexismendozaa/edit-password-ms:latest  
     ports:
       - "3006:5006"
     networks:
@@ -36,6 +41,7 @@ services:
   edit-username-ms:
     build:
       context: ./edit-username-ms
+      image: alexismendozaa/edit-username-ms:latest  
     ports:
       - "3004:5004"
     networks:
@@ -44,6 +50,7 @@ services:
   get-info-ms:
     build:
       context: ./get-info-ms
+      image: alexismendozaa/get-info-ms:latest  
     ports:
       - "3009:5009"
     networks:
