@@ -37,7 +37,7 @@ pool.query('SELECT NOW()')
   });
 
 // Configure the server
-const PORT = process.env.PORT || 3007;
+const PORT =  3007;
 
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
