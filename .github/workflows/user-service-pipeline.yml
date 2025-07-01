@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 name: CI-CD User Microservices
-=======
-name: Build and Deploy
->>>>>>> 2f4d051fd23a7f5da5caa296ee7032f9837f4175
 
 on:
   push:
@@ -33,7 +29,6 @@ jobs:
   #### 1. TESTS ####
   test:
     runs-on: ubuntu-latest
-<<<<<<< HEAD
     strategy:
       matrix:
         service:
@@ -43,9 +38,6 @@ jobs:
           - edit-avatar-ms
           - edit-password-ms
           - delete-account-ms
-=======
-
->>>>>>> 2f4d051fd23a7f5da5caa296ee7032f9837f4175
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,7 +84,6 @@ jobs:
       - name: Detect changes for service
         id: changes
         run: |
-<<<<<<< HEAD
           git fetch --prune --unshallow || git fetch --all
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             git fetch origin ${{ github.base_ref }}
@@ -108,14 +99,6 @@ jobs:
 
       - name: Build Docker image
         if: steps.changes.outputs.changed == 'true'
-=======
-          sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
-
-      # Step 4: Install dependencies and run tests for all microservices
-      - name: Install dependencies and run tests for all microservices
->>>>>>> 2f4d051fd23a7f5da5caa296ee7032f9837f4175
         run: |
           docker build -t alexismendozaa/${{ matrix.service }}:latest ./${{ matrix.service }}
 
@@ -276,40 +259,12 @@ jobs:
           key: ${{ secrets.SSH_KEY_PROD }}
           port: 22
           script: |
-<<<<<<< HEAD
             docker network inspect users_network >/dev/null 2>&1 || docker network create users_network
 
             docker rm -f ${{ matrix.service }} || true
-=======
-            export DB_HOST=${{ secrets.DB_HOST }}
-            export DB_USER=${{ secrets.DB_USER }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export DB_NAME=${{ secrets.DB_NAME }}
-            export JWT_SECRET=${{ secrets.JWT_SECRET }}
-            export JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
-            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
-            export AWS_REGION=${{ secrets.AWS_REGION }}
-            export DB_PORT=${{ secrets.DB_PORT }}
-            export DB_SSL=${{ secrets.DB_SSL }}
-
-            docker run -d --name delete-account-ms \
-              -p 5008:3008 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/delete-account-ms:latest
->>>>>>> 2f4d051fd23a7f5da5caa296ee7032f9837f4175
 
             docker pull alexismendozaa/${{ matrix.service }}:latest
 
-<<<<<<< HEAD
             case "${{ matrix.service }}" in
               get-info-ms)
                 docker run -d --name get-info-ms \
@@ -348,60 +303,3 @@ jobs:
                   alexismendozaa/delete-account-ms:latest
                 ;;
             esac
-=======
-            docker run -d --name edit-email-ms \
-              -p 5005:3005 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/edit-email-ms:latest
-
-            docker run -d --name edit-password-ms \
-              -p 5006:3006 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/edit-password-ms:latest
-
-            docker run -d --name edit-username-ms \
-              -p 5004:3004 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/edit-username-ms:latest
-
-            docker run -d --name get-info-ms \
-              -p 5009:3009 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/get-info-ms:latest
->>>>>>> 2f4d051fd23a7f5da5caa296ee7032f9837f4175
