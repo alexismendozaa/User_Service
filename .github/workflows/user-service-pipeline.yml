@@ -1,167 +1,305 @@
-name: Docker Build and Deploy
+name: CI-CD User Microservices
 
 on:
   push:
-    branches:
-      - test
+    branches: [main, test]
+    paths:
+      - 'get-info-ms/**'
+      - 'edit-username-ms/**'
+      - 'edit-email-ms/**'
+      - 'edit-avatar-ms/**'
+      - 'edit-password-ms/**'
+      - 'delete-account-ms/**'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - 'get-info-ms/**'
+      - 'edit-username-ms/**'
+      - 'edit-email-ms/**'
+      - 'edit-avatar-ms/**'
+      - 'edit-password-ms/**'
+      - 'delete-account-ms/**'
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
 jobs:
-  build_and_deploy:
+  #### 1. TESTS ####
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - get-info-ms
+          - edit-username-ms
+          - edit-email-ms
+          - edit-avatar-ms
+          - edit-password-ms
+          - delete-account-ms
     steps:
-      # Step 1: Checkout the code
-      - name: Check out code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Step 2: Log in to Docker Hub before building images
-      - name: Log in to Docker Hub
+      - name: Detect changes for service
+        id: changes
         run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          git fetch --prune --unshallow || git fetch --all
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git fetch origin ${{ github.base_ref }}
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^${{ matrix.service }}/" || true)
+          else
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep "^${{ matrix.service }}/" || true)
+          fi
+          if [[ -n "$CHANGED" ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
 
-      # Step 3: Install Docker Compose
-      - name: Install Docker Compose
+      - name: Run static check (if test exists)
+        if: steps.changes.outputs.changed == 'true' && hashFiles(format('{0}/tests/static_check.sh', matrix.service)) != ''
+        run: bash ${{ matrix.service }}/tests/static_check.sh
+
+  #### 2. BUILD ####
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        service:
+          - get-info-ms
+          - edit-username-ms
+          - edit-email-ms
+          - edit-avatar-ms
+          - edit-password-ms
+          - delete-account-ms
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes for service
+        id: changes
         run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
+          git fetch --prune --unshallow || git fetch --all
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git fetch origin ${{ github.base_ref }}
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^${{ matrix.service }}/" || true)
+          else
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep "^${{ matrix.service }}/" || true)
+          fi
+          if [[ -n "$CHANGED" ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
 
-      # Step 4: Install dependencies and run tests for each microservicio
-      - name: Install dependencies and run tests for all microservices
+      - name: Build Docker image
+        if: steps.changes.outputs.changed == 'true'
         run: |
-          for dir in delete-account-ms edit-avatar-ms edit-email-ms edit-password-ms edit-username-ms get-info-ms; do
-            cd $dir
-            npm install
-            npm test
-            cd ..
-          done
+          docker build -t alexismendozaa/${{ matrix.service }}:latest ./${{ matrix.service }}
 
-      # Step 5: Build Docker images using Docker Compose
-      - name: Build Docker images using Docker Compose
+      - name: Save Docker image artifact
+        if: steps.changes.outputs.changed == 'true'
+        run: docker save alexismendozaa/${{ matrix.service }}:latest -o ${{ matrix.service }}.tar
+
+      - uses: actions/upload-artifact@v4
+        if: steps.changes.outputs.changed == 'true'
+        with:
+          name: ${{ matrix.service }}-image
+          path: ${{ matrix.service }}.tar
+
+  #### 3. PUSH ####
+  push:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        service:
+          - get-info-ms
+          - edit-username-ms
+          - edit-email-ms
+          - edit-avatar-ms
+          - edit-password-ms
+          - delete-account-ms
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes for service
+        id: changes
         run: |
-          docker-compose -f docker-compose.yml build
+          git fetch --prune --unshallow || git fetch --all
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git fetch origin ${{ github.base_ref }}
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep "^${{ matrix.service }}/" || true)
+          else
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep "^${{ matrix.service }}/" || true)
+          fi
+          if [[ -n "$CHANGED" ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
 
-      # Step 6: Push Docker images to Docker Hub
-      - name: Push Docker images to Docker Hub
-        run: |
-          docker-compose -f docker-compose.yml push
+      - uses: actions/download-artifact@v4
+        if: steps.changes.outputs.changed == 'true'
+        with:
+          name: ${{ matrix.service }}-image
 
-      # Step 7: Clean up existing containers on EC2
-      - name: Clean up existing containers on EC2
+      - name: Load Docker image
+        if: steps.changes.outputs.changed == 'true'
+        run: docker load -i ${{ matrix.service }}.tar
+
+      - name: Login to Docker Hub
+        if: steps.changes.outputs.changed == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
+
+      - name: Push Docker image
+        if: steps.changes.outputs.changed == 'true'
+        run: docker push alexismendozaa/${{ matrix.service }}:latest
+
+  #### 4. DEPLOY TEST ####
+  deploy_test:
+    runs-on: ubuntu-latest
+    needs: push
+    if: github.ref == 'refs/heads/test'
+    strategy:
+      matrix:
+        service:
+          - get-info-ms
+          - edit-username-ms
+          - edit-email-ms
+          - edit-avatar-ms
+          - edit-password-ms
+          - delete-account-ms
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy updated microservice to EC2 TEST via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_QA }}
           username: ubuntu
           key: ${{ secrets.SSH_KEY_QA }}
           port: 22
-          debug: true
           script: |
-            docker stop $(docker ps -aq) || true
-            docker rm $(docker ps -aq) || true
-            docker system prune -af || true
+            docker network inspect users_network >/dev/null 2>&1 || docker network create users_network
 
-      # Step 8: Deploy to EC2 via SSH
-      - name: Deploy to EC2 via SSH
+            docker rm -f ${{ matrix.service }} || true
+
+            docker pull alexismendozaa/${{ matrix.service }}:latest
+
+            case "${{ matrix.service }}" in
+              get-info-ms)
+                docker run -d --name get-info-ms \
+                  --network users_network \
+                  -p 5009:3009 \
+                  alexismendozaa/get-info-ms:latest
+                ;;
+              edit-username-ms)
+                docker run -d --name edit-username-ms \
+                  --network users_network \
+                  -p 5004:3004 \
+                  alexismendozaa/edit-username-ms:latest
+                ;;
+              edit-email-ms)
+                docker run -d --name edit-email-ms \
+                  --network users_network \
+                  -p 5005:3005 \
+                  alexismendozaa/edit-email-ms:latest
+                ;;
+              edit-avatar-ms)
+                docker run -d --name edit-avatar-ms \
+                  --network users_network \
+                  -p 5007:3007 \
+                  alexismendozaa/edit-avatar-ms:latest
+                ;;
+              edit-password-ms)
+                docker run -d --name edit-password-ms \
+                  --network users_network \
+                  -p 5006:3006 \
+                  alexismendozaa/edit-password-ms:latest
+                ;;
+              delete-account-ms)
+                docker run -d --name delete-account-ms \
+                  --network users_network \
+                  -p 5008:3008 \
+                  alexismendozaa/delete-account-ms:latest
+                ;;
+            esac
+
+  #### 5. DEPLOY PROD ####
+  deploy_prod:
+    runs-on: ubuntu-latest
+    needs: push
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        service:
+          - get-info-ms
+          - edit-username-ms
+          - edit-email-ms
+          - edit-avatar-ms
+          - edit-password-ms
+          - delete-account-ms
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy updated microservice to EC2 PROD via SSH
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_QA }}
+          host: ${{ secrets.EC2_PROD }}
           username: ubuntu
-          key: ${{ secrets.SSH_KEY_QA }}
+          key: ${{ secrets.SSH_KEY_PROD }}
           port: 22
-          debug: true
           script: |
-            # Export environment variables para cada microservicio
-            export DB_HOST=${{ secrets.DB_HOST }}
-            export DB_USER=${{ secrets.DB_USER }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export DB_NAME=${{ secrets.DB_NAME }}
-            export JWT_SECRET=${{ secrets.JWT_SECRET }}
-            export JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
-            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
-            export AWS_REGION=${{ secrets.AWS_REGION }}
-            export DB_PORT=${{ secrets.DB_PORT }}
-            export DB_SSL=${{ secrets.DB_SSL }}
+            docker network inspect users_network >/dev/null 2>&1 || docker network create users_network
 
-            # Run containers for each microservice
-            docker run -d --name delete-account-ms \
-              -p 5008:3008 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/delete-account-ms:latest
+            docker rm -f ${{ matrix.service }} || true
 
-            docker run -d --name edit-avatar-ms \
-              -p 5007:3007 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/edit-avatar-ms:latest
+            docker pull alexismendozaa/${{ matrix.service }}:latest
 
-            docker run -d --name edit-email-ms \
-              -p 5005:3005 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/edit-email-ms:latest
-
-            docker run -d --name edit-password-ms \
-              -p 5006:3006 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/edit-password-ms:latest
-
-            docker run -d --name edit-username-ms \
-              -p 5004:3004 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/edit-username-ms:latest
-
-            docker run -d --name get-info-ms \
-              -p 5009:3009 \
-              -e DB_HOST=$DB_HOST \
-              -e DB_USER=$DB_USER \
-              -e DB_PASSWORD=$DB_PASSWORD \
-              -e DB_NAME=$DB_NAME \
-              -e JWT_SECRET=$JWT_SECRET \
-              -e JWT_EXPIRATION=$JWT_EXPIRATION \
-              -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
-              -e AWS_REGION=$AWS_REGION \
-              -e DB_PORT=$DB_PORT \
-              -e DB_SSL=$DB_SSL \
-              ${{ secrets.DOCKERHUB_USERNAME }}/get-info-ms:latest
+            case "${{ matrix.service }}" in
+              get-info-ms)
+                docker run -d --name get-info-ms \
+                  --network users_network \
+                  -p 5009:3009 \
+                  alexismendozaa/get-info-ms:latest
+                ;;
+              edit-username-ms)
+                docker run -d --name edit-username-ms \
+                  --network users_network \
+                  -p 5004:3004 \
+                  alexismendozaa/edit-username-ms:latest
+                ;;
+              edit-email-ms)
+                docker run -d --name edit-email-ms \
+                  --network users_network \
+                  -p 5005:3005 \
+                  alexismendozaa/edit-email-ms:latest
+                ;;
+              edit-avatar-ms)
+                docker run -d --name edit-avatar-ms \
+                  --network users_network \
+                  -p 5007:3007 \
+                  alexismendozaa/edit-avatar-ms:latest
+                ;;
+              edit-password-ms)
+                docker run -d --name edit-password-ms \
+                  --network users_network \
+                  -p 5006:3006 \
+                  alexismendozaa/edit-password-ms:latest
+                ;;
+              delete-account-ms)
+                docker run -d --name delete-account-ms \
+                  --network users_network \
+                  -p 5008:3008 \
+                  alexismendozaa/delete-account-ms:latest
+                ;;
+            esac

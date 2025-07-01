@@ -1,11 +1,16 @@
-FROM node:18-alpine
+FROM node:20-slim
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-COPY . .
+COPY app.js .
+COPY swagger.js .
+COPY config ./config
+COPY controllers ./controllers
+COPY middlewares ./middlewares
+COPY routes ./routes
 
 EXPOSE 3009
 
