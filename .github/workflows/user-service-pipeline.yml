@@ -196,41 +196,108 @@ jobs:
 
             docker pull alexismendozaa/${{ matrix.service }}:latest
 
+            export DB_HOST='${{ secrets.DB_HOST }}'
+            export DB_PORT='${{ secrets.DB_PORT }}'
+            export DB_USER='${{ secrets.DB_USER }}'
+            export DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+            export DB_NAME='${{ secrets.DB_NAME }}'
+            export DB_SSL='${{ secrets.DB_SSL }}'
+            export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+            export JWT_EXPIRATION='${{ secrets.JWT_EXPIRATION }}'
+
             case "${{ matrix.service }}" in
               get-info-ms)
                 docker run -d --name get-info-ms \
                   --network users_network \
                   -p 5009:3009 \
+                  -e PORT=3009 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/get-info-ms:latest
                 ;;
               edit-username-ms)
                 docker run -d --name edit-username-ms \
                   --network users_network \
                   -p 5004:3004 \
+                  -e PORT=3004 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/edit-username-ms:latest
                 ;;
               edit-email-ms)
                 docker run -d --name edit-email-ms \
                   --network users_network \
                   -p 5005:3005 \
+                  -e PORT=3005 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/edit-email-ms:latest
                 ;;
               edit-avatar-ms)
+                export AWS_REGION='${{ secrets.AWS_REGION }}'
+                export S3_BUCKET_NAME='${{ secrets.S3_BUCKET_NAME }}'
                 docker run -d --name edit-avatar-ms \
                   --network users_network \
                   -p 5007:3007 \
+                  -e PORT=3007 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
+                  -e AWS_REGION=$AWS_REGION \
+                  -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
                   alexismendozaa/edit-avatar-ms:latest
                 ;;
               edit-password-ms)
                 docker run -d --name edit-password-ms \
                   --network users_network \
                   -p 5006:3006 \
+                  -e PORT=3006 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/edit-password-ms:latest
                 ;;
               delete-account-ms)
                 docker run -d --name delete-account-ms \
                   --network users_network \
                   -p 5008:3008 \
+                  -e PORT=3008 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/delete-account-ms:latest
                 ;;
             esac
@@ -265,41 +332,108 @@ jobs:
 
             docker pull alexismendozaa/${{ matrix.service }}:latest
 
+            export DB_HOST='${{ secrets.DB_HOST }}'
+            export DB_PORT='${{ secrets.DB_PORT }}'
+            export DB_USER='${{ secrets.DB_USER }}'
+            export DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+            export DB_NAME='${{ secrets.DB_NAME }}'
+            export DB_SSL='${{ secrets.DB_SSL }}'
+            export JWT_SECRET='${{ secrets.JWT_SECRET }}'
+            export JWT_EXPIRATION='${{ secrets.JWT_EXPIRATION }}'
+
             case "${{ matrix.service }}" in
               get-info-ms)
                 docker run -d --name get-info-ms \
                   --network users_network \
                   -p 5009:3009 \
+                  -e PORT=3009 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/get-info-ms:latest
                 ;;
               edit-username-ms)
                 docker run -d --name edit-username-ms \
                   --network users_network \
                   -p 5004:3004 \
+                  -e PORT=3004 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/edit-username-ms:latest
                 ;;
               edit-email-ms)
                 docker run -d --name edit-email-ms \
                   --network users_network \
                   -p 5005:3005 \
+                  -e PORT=3005 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/edit-email-ms:latest
                 ;;
               edit-avatar-ms)
+                export AWS_REGION='${{ secrets.AWS_REGION }}'
+                export S3_BUCKET_NAME='${{ secrets.S3_BUCKET_NAME }}'
                 docker run -d --name edit-avatar-ms \
                   --network users_network \
                   -p 5007:3007 \
+                  -e PORT=3007 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
+                  -e AWS_REGION=$AWS_REGION \
+                  -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
                   alexismendozaa/edit-avatar-ms:latest
                 ;;
               edit-password-ms)
                 docker run -d --name edit-password-ms \
                   --network users_network \
                   -p 5006:3006 \
+                  -e PORT=3006 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/edit-password-ms:latest
                 ;;
               delete-account-ms)
                 docker run -d --name delete-account-ms \
                   --network users_network \
                   -p 5008:3008 \
+                  -e PORT=3008 \
+                  -e DB_HOST=$DB_HOST \
+                  -e DB_PORT=$DB_PORT \
+                  -e DB_USER=$DB_USER \
+                  -e DB_PASSWORD=$DB_PASSWORD \
+                  -e DB_NAME=$DB_NAME \
+                  -e DB_SSL=$DB_SSL \
+                  -e JWT_SECRET=$JWT_SECRET \
+                  -e JWT_EXPIRATION=$JWT_EXPIRATION \
                   alexismendozaa/delete-account-ms:latest
                 ;;
             esac
