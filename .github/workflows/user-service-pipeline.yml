@@ -204,6 +204,8 @@ jobs:
             export DB_SSL='${{ secrets.DB_SSL }}'
             export JWT_SECRET='${{ secrets.JWT_SECRET }}'
             export JWT_EXPIRATION='${{ secrets.JWT_EXPIRATION }}'
+            export DB_NAME_USERS='${{ secrets.DB_NAME_USERS }}'
+            export DB_NAME_POST='${{ secrets.DB_NAME_POST }}'
 
             case "${{ matrix.service }}" in
               get-info-ms)
@@ -219,6 +221,8 @@ jobs:
                   -e DB_SSL=$DB_SSL \
                   -e JWT_SECRET=$JWT_SECRET \
                   -e JWT_EXPIRATION=$JWT_EXPIRATION \
+                  -e DB_NAME_USERS=$DB_NAME_USERS \
+                  -e DB_NAME_POST=$DB_NAME_POST \
                   alexismendozaa/get-info-ms:latest
                 ;;
               edit-username-ms)
@@ -340,6 +344,8 @@ jobs:
             export DB_SSL='${{ secrets.DB_SSL }}'
             export JWT_SECRET='${{ secrets.JWT_SECRET }}'
             export JWT_EXPIRATION='${{ secrets.JWT_EXPIRATION }}'
+            export DB_NAME_USERS='${{ secrets.DB_NAME_USERS }}'
+            export DB_NAME_POST='${{ secrets.DB_NAME_POST }}'
 
             case "${{ matrix.service }}" in
               get-info-ms)
@@ -355,6 +361,8 @@ jobs:
                   -e DB_SSL=$DB_SSL \
                   -e JWT_SECRET=$JWT_SECRET \
                   -e JWT_EXPIRATION=$JWT_EXPIRATION \
+                  -e DB_NAME_USERS=$DB_NAME_USERS \
+                  -e DB_NAME_POST=$DB_NAME_POST \
                   alexismendozaa/get-info-ms:latest
                 ;;
               edit-username-ms)
