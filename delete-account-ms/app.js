@@ -15,6 +15,6 @@ setupSwagger(app);
 
 const PORT =  3008;
 
-app.listen(PORT, () => {
-  console.log(`Edit Username Service running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Running on port ${PORT}`);
 });

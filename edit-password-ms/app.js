@@ -16,6 +16,6 @@ app.use('/api-docs-password', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/user', userRoutes);
 
 const PORT = 3006;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Running on port ${PORT}`);
 });
