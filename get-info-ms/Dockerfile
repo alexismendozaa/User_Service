@@ -11,6 +11,7 @@ COPY config ./config
 COPY controllers ./controllers
 COPY middlewares ./middlewares
 COPY routes ./routes
+COPY graphql ./graphql 
 
 EXPOSE 3009
 
