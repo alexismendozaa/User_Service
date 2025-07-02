@@ -1,27 +1,25 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Pool for users database
+// Direct assignment: hardcoded database names
 const userPool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME_USERS,
+  database: 'users', 
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
-// Pool for posts database
 const postPool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME_POST,
+  database: 'post', 
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
-// Optional: handle pool errors
 userPool.on('error', (err) => {
   console.error('Unexpected error on idle userPool client', err);
   process.exit(-1);
