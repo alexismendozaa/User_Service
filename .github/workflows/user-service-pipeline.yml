@@ -217,7 +217,6 @@ jobs:
                   -e DB_PORT=$DB_PORT \
                   -e DB_USER=$DB_USER \
                   -e DB_PASSWORD=$DB_PASSWORD \
-                  -e DB_NAME=$DB_NAME \
                   -e DB_SSL=$DB_SSL \
                   -e JWT_SECRET=$JWT_SECRET \
                   -e JWT_EXPIRATION=$JWT_EXPIRATION \
@@ -357,7 +356,6 @@ jobs:
                   -e DB_PORT=$DB_PORT \
                   -e DB_USER=$DB_USER \
                   -e DB_PASSWORD=$DB_PASSWORD \
-                  -e DB_NAME=$DB_NAME \
                   -e DB_SSL=$DB_SSL \
                   -e JWT_SECRET=$JWT_SECRET \
                   -e JWT_EXPIRATION=$JWT_EXPIRATION \
